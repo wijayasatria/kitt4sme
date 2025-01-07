@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sustainability Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .dashboard-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .dashboard-card h3 {
+            color: #007bff;
+        }
+        .chart {
+            width: 100%;
+            height: auto;
+        }
+        .map {
+            height: 300px;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            margin-top: 20px;
+        }
+        .generate-report {
+            margin: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Sustainability Dashboard</h1>
+</div>
+
+<div class="generate-report">
+    <button class="btn btn-primary" onclick="alert('Generate PDF feature coming soon!')">Generate Full Report</button>
+</div>
+
+<div class="dashboard-container">
+    <div class="dashboard-card">
+        <h3>Carbon Emissions Over Time</h3>
+        <canvas id="carbonEmissionsChart" class="chart"></canvas>
+    </div>
+    <div class="dashboard-card">
+        <h3>Renewable Energy Usage Over Time</h3>
+        <canvas id="renewableEnergyChart" class="chart"></canvas>
+    </div>
+    <div class="dashboard-card">
+        <h3>Waste Recycling Rates</h3>
+        <canvas id="wasteManagementChart" class="chart"></canvas>
+    </div>
+    <div class="dashboard-card">
+        <h3>Water Consumption Breakdown</h3>
+        <canvas id="waterUsageChart" class="chart"></canvas>
+    </div>
+    <div class="dashboard-card">
+        <h3>Energy Efficiency Improvements</h3>
+        <canvas id="energyEfficiencyChart" class="chart"></canvas>
+    </div>
+    <div class="dashboard-card">
+        <h3>Diversity in Workforce</h3>
+        <canvas id="workforceDiversityChart" class="chart"></canvas>
+    </div>
+    <div class="dashboard-card">
+        <h3>Health and Safety Metrics</h3>
+        <canvas id="healthSafetyChart" class="chart"></canvas>
+    </div>
+    <div class="dashboard-card">
+        <h3>Supply Chain Sustainability Over Time</h3>
+        <canvas id="supplyChainChart" class="chart"></canvas>
+    </div>
+    <div class="dashboard-card">
+        <h3>Key Metrics Table</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>2021</th>
+                    <th>2022</th>
+                    <th>2023</th>
+                    <th>2024</th>
+                    <th>2025</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Carbon Emissions (Kt CO2e)</td>
+                    <td>29</td>
+                    <td>25</td>
+                    <td>20</td>
+                    <td>18</td>
+                    <td>15</td>
+                </tr>
+                <tr>
+                    <td>Renewable Energy Usage (%)</td>
+                    <td>50</td>
+                    <td>58</td>
+                    <td>68</td>
+                    <td>75</td>
+                    <td>85</td>
+                </tr>
+                <tr>
+                    <td>Recycled Waste (%)</td>
+                    <td>60</td>
+                    <td>65</td>
+                    <td>70</td>
+                    <td>75</td>
+                    <td>80</td>
+                </tr>
+                <tr>
+                    <td>Water Recycling (%)</td>
+                    <td>35</td>
+                    <td>38</td>
+                    <td>42</td>
+                    <td>46</td>
+                    <td>50</td>
+                </tr>
+                <tr>
+                    <td>Energy Efficiency Improvement (%)</td>
+                    <td>10</td>
+                    <td>12</td>
+                    <td>15</td>
+                    <td>18</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td>Supply Chain Sustainability (%)</td>
+                    <td>70</td>
+                    <td>75</td>
+                    <td>80</td>
+                    <td>85</td>
+                    <td>90</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="footer">
+    <p>For more information, contact us at <a href="mailto:sustainability@company.com">sustainability@company.com</a></p>
+</div>
+
+<script>
+    const chartsData = {
+        carbonEmissions: {
+            labels: ['2021', '2022', '2023', '2024', '2025'],
+            data: [29, 25, 20, 18, 15],
+            title: 'Carbon Emissions (Kt CO2e)'
+        },
+        renewableEnergy: {
+            labels: ['2021', '2022', '2023', '2024', '2025'],
+            data: [50, 58, 68, 75, 85],
+            title: 'Renewable Energy Usage (%)'
+        },
+        wasteManagement: {
+            labels: ['2021', '2022', '2023', '2024', '2025'],
+            data: [60, 65, 70, 75, 80],
+            title: 'Recycled Waste (%)'
+        },
+        waterUsage: {
+            labels: ['Recycled Water', 'Non-recycled Water'],
+            data: [42, 58],
+            title: 'Water Usage Breakdown (%)'
+        },
+        energyEfficiency: {
+            labels: ['2021', '2022', '2023', '2024', '2025'],
+            data: [10, 12, 15, 18, 20],
+            title: 'Energy Efficiency Improvement (%)'
+        },
+        workforceDiversity: {
+            labels: ['Female in Management', 'Others'],
+            data: [40, 60],
+            title: 'Workforce Diversity (%)'
+        },
+        healthSafety: {
+            labels: ['Incident Free', 'Incidents'],
+            data: [99.85, 0.15],
+            title: 'Health and Safety (%)'
+        },
+        supplyChain: {
+            labels: ['2021', '2022', '2023', '2024', '2025'],
+            data: [70, 75, 80, 85, 90],
+            title: 'Supply Chain Sustainability (%)'
+        }
+    };
+
+    function createChart(ctx, type, labels, data, title) {
+        new Chart(ctx, {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: title,
+                    data: data,
+                    backgroundColor: type === 'pie' ? [
+                        '#007bff', '#6c757d', '#28a745', '#dc3545', '#ffc107', '#17a2b8'
+                    ] : '#007bff',
+                    borderColor: '#004085',
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: type === 'pie',
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: title
+                    }
+                },
+                scales: type === 'line' || type === 'bar' ? {
+                    y: {
+                        beginAtZero: true
+                    }
+                } : {}
+            }
+        });
+    }
+
+    window.onload = function () {
+        createChart(document.getElementById('carbonEmissionsChart'), 'line', chartsData.carbonEmissions.labels, chartsData.carbonEmissions.data, chartsData.carbonEmissions.title);
+        createChart(document.getElementById('renewableEnergyChart'), 'line', chartsData.renewableEnergy.labels, chartsData.renewableEnergy.data, chartsData.renewableEnergy.title);
+        createChart(document.getElementById('wasteManagementChart'), 'bar', chartsData.wasteManagement.labels, chartsData.wasteManagement.data, chartsData.wasteManagement.title);
+        createChart(document.getElementById('waterUsageChart'), 'pie', chartsData.waterUsage.labels, chartsData.waterUsage.data, chartsData.waterUsage.title);
+        createChart(document.getElementById('energyEfficiencyChart'), 'bar', chartsData.energyEfficiency.labels, chartsData.energyEfficiency.data, chartsData.energyEfficiency.title);
+        createChart(document.getElementById('workforceDiversityChart'), 'pie', chartsData.workforceDiversity.labels, chartsData.workforceDiversity.data, chartsData.workforceDiversity.title);
+        createChart(document.getElementById('healthSafetyChart'), 'pie', chartsData.healthSafety.labels, chartsData.healthSafety.data, chartsData.healthSafety.title);
+        createChart(document.getElementById('supplyChainChart'), 'bar', chartsData.supplyChain.labels, chartsData.supplyChain.data, chartsData.supplyChain.title);
+    };
+</script>
+
+</body>
+</html>
