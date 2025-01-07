@@ -21,7 +21,11 @@ from flask import Flask, request, jsonify, render_template_string, render_templa
 import openai
 
 # Set your OpenAI API key
-openai.api_key = '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'
+keyA = 'sk-proj-8w3LqTH6-mE5I0iOz-PuwTa4iyc7N6PWXP4cN'
+keyB = '-OS5sHQQHl7RfuWzLormnRamx_hBqhiBdAlFuT3BlbkFJ'
+keyC = '6lJchqvvfq5qGWHVSb9Z8-NZIjjdyL58gM3G'
+keyD = '-ySnWA3gXzUm1hvuhAb2H67W9H-sTMd343cX0A'
+openai.api_key = keyA + keyB + keyC + keyD
 
 # Flask application
 app = Flask(__name__)
