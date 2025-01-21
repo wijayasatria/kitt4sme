@@ -17,8 +17,9 @@ install_packages()
 import pandas as pd
 import PyPDF2
 from docx import Document
-from flask import Flask, request, jsonify, render_template_string, render_template, make_response, send_from_directory
+from flask import Flask, request, jsonify, render_template_string, render_template, make_response, send_from_directory, redirect
 import openai
+
 
 # Set your OpenAI API key
 keyA = 'sk-proj-8w3LqTH6-mE5I0iOz-PuwTa4iyc7N6PWXP4cN'
@@ -82,8 +83,13 @@ def get_gpt_response(user_input, focus):
 
 # Route for the main page
 @app.route("/")
+def home():
+    return redirect("/knowledge_hub")
+
+# Route for knowledge hub
+@app.route("/knowledge_hub")
 def index():
-    return render_template_string(HTML_TEMPLATE)
+    return render_template("knowledge_hub.html")
 
 # Route to get responses for different sections
 @app.route("/get_responses", methods=["POST"])
@@ -142,212 +148,9 @@ def sustainability_report():
 def alerts():
     return render_template('sustainability_alerts.html')  # Renders the new alerts page
 
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KITT4SME</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .sections {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-        .section {
-            flex: 1;
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-        }
-        .section h2 {
-            margin-top: 0;
-            font-size: 1.2em;
-        }
-        .chat-box, .response-box {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 10px;
-        }
-        .input-box {
-            display: flex;
-            margin-top: auto;
-        }
-        .input-box input[type="text"] {
-            flex: 1;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 5px;
-        }
-        .input-box button {
-            padding: 5px 10px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .upload-box {
-            margin-top: 10px;
-        }
-        .upload-box input[type="file"] {
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .upload-box button {
-            padding: 5px 10px;
-            margin-left: 5px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        @media (max-width: 768px) {
-            .sections {
-                flex-direction: column;
-            }
-        }
-        header {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            text-align: center;
-        }
-        nav {
-            margin-top: 10px;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-            padding: 5px 10px;
-            background-color: #0056b3;
-            border-radius: 5px;
-        }
-        nav a:hover {
-            background-color: #003f7f;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>KITT4SME Sustainability Tool</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/sustainability_report">Sustainability Report</a>
-            <a href="/sustainability_alerts">Sustainability Action Alerts</a>
-        </nav>
-    </header>
-    <div class="container">
-        <div class="section">
-            <h2>KITT4SME Sustainability Knowledge Hub</h2>
-            <div id="chat-box" class="chat-box"></div>
-            <div class="input-box">
-                <input id="user-input" type="text" placeholder="Type your message here..." />
-                <button onclick="sendMessage()">Send</button>
-            </div>
-            <div class="upload-box">
-                <input id="file-upload" type="file" />
-                <button onclick="uploadFile()">Upload File</button>
-            </div>
-        </div>
-        <div class="sections">
-            <div class="section">
-                <h2>Environment</h2>
-                <div id="environment-response" class="response-box"></div>
-            </div>
-            <div class="section">
-                <h2>Social</h2>
-                <div id="social-response" class="response-box"></div>
-            </div>
-            <div class="section">
-                <h2>Economy</h2>
-                <div id="economy-response" class="response-box"></div>
-            </div>
-        </div>
-    </div>
-    <script>
-        async function sendMessage() {
-            const userInput = document.getElementById("user-input").value;
-            if (userInput.trim() === "") return;
-
-            const chatBox = document.getElementById("chat-box");
-            const userMessage = document.createElement("div");
-            userMessage.className = "message user";
-            userMessage.innerHTML = `<strong>You:</strong> ${userInput}`;
-            chatBox.appendChild(userMessage);
-
-            document.getElementById("user-input").value = "";
-
-            const response = await fetch("/get_responses", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ user_input: userInput }),
-            });
-
-            const data = await response.json();
-
-            document.getElementById("environment-response").innerHTML = `<strong>Environment:</strong> ${data.environment_response}`;
-            document.getElementById("social-response").innerHTML = `<strong>Social:</strong> ${data.social_response}`;
-            document.getElementById("economy-response").innerHTML = `<strong>Economy:</strong> ${data.economy_response}`;
-
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        async function uploadFile() {
-            const fileInput = document.getElementById("file-upload");
-            const file = fileInput.files[0];
-
-            if (!file) {
-                alert("Please select a file to upload.");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append("file", file);
-
-            const response = await fetch("/upload", {
-                method: "POST",
-                body: formData,
-            });
-
-            const data = await response.json();
-            alert(data.message);
-
-            if (data.status === "success") {
-                const chatBox = document.getElementById("chat-box");
-                const botMessage = document.createElement("div");
-                botMessage.className = "message bot";
-                botMessage.innerHTML = `<strong>KITT4SME:</strong> File uploaded successfully. Processed ${data.character_count} characters from the file.`;
-                chatBox.appendChild(botMessage);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-    </script>
-</body>
-</html>
-"""
+@app.route('/templates/<path:filename>')
+def serve_template_file(filename):
+    return send_from_directory('templates', filename)
 
 if __name__ == "__main__":
     app.run(debug=True)
