@@ -57,7 +57,7 @@
         }
         .main-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 10px;
             height: calc(100% - 60px);
         }
@@ -69,7 +69,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            overflow: auto;
+            overflow: hidden;
         }
         .section h2 {
             font-size: 1.2em;
@@ -78,11 +78,7 @@
         }
         .chart-container {
             flex-grow: 1;
-            height: 35%;
-        }
-        form {
-            flex-grow: 1;
-            overflow-y: auto;
+            height: 40%;
         }
         canvas {
             width: 100%;
@@ -109,6 +105,24 @@
             color: #28a745;
             margin-top: 10px;
             font-weight: bold;
+        }
+        .alert-header {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .alert-header:hover {
+            background-color: #f0f0f0;
+        }
+        .alert-content {
+            display: none;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            margin-top: 5px;
+        }
+        .alert-card.expanded .alert-content {
+            display: block;
         }
     </style>
 </head>
@@ -153,33 +167,58 @@
             <div class="section">
                 <h2>Current Alerts</h2>
                 <div class="alert-card">
-                    <h4>Alert: High Energy Consumption Detected</h4>
-                    <p><strong>Current Level:</strong> 125% of the predefined threshold (<span id="energyThresholdDisplay">96</span> kWh)</p>
-                    <p><strong>Possible Root Cause:</strong> Inefficient machinery usage or equipment malfunction.</p>
-                    <p class="recommendation"><strong>Recommended Action:</strong> Optimize scheduling and inspect machinery.</p>
+                    <div class="alert-header">
+                        <h4>Alert: High Energy Consumption Detected</h4>
+                        <p><strong>Current Level:</strong> 125% of the predefined threshold (<span id="energyThresholdDisplay">96</span> kWh)</p>
+                    </div>
+                    <div class="alert-content">
+                        <p><strong>Possible Root Cause:</strong> Inefficient machinery usage or equipment malfunction.</p>
+                        <p class="recommendation"><strong>Recommended Action:</strong> Optimize scheduling and inspect machinery.</p>
+                    </div>
                 </div>
                 <div class="alert-card">
-                    <h4>Alert: High Carbon Emissions</h4>
-                    <p><strong>Current Emissions:</strong> 22 metric tons CO<sub>2</sub>e (<span id="emissionsThresholdDisplay">18</span> metric tons)</p>
-                    <p><strong>Possible Root Cause:</strong> Outdated exhaust systems or inefficient combustion processes.</p>
-                    <p class="recommendation"><strong>Recommended Action:</strong> Perform maintenance on exhaust systems and switch to cleaner fuel sources.</p>
+                    <div class="alert-header">
+                        <h4>Alert: High Carbon Emissions</h4>
+                        <p><strong>Current Emissions:</strong> 22 metric tons CO<sub>2</sub>e (<span id="emissionsThresholdDisplay">18</span> metric tons)</p>
+                    </div>
+                    <div class="alert-content">
+                        <p><strong>Possible Root Cause:</strong> Outdated exhaust systems or inefficient combustion processes.</p>
+                        <p class="recommendation"><strong>Recommended Action:</strong> Perform maintenance on exhaust systems and switch to cleaner fuel sources.</p>
+                    </div>
                 </div>
                 <div class="alert-card">
-                    <h4>Alert: Inefficient Water Usage</h4>
-                    <p><strong>Water Wastage:</strong> 15% of total consumption (<span id="waterThresholdDisplay">12</span>%)</p>
-                    <p><strong>Possible Root Cause:</strong> Leaks or outdated recycling systems.</p>
-                    <p class="recommendation"><strong>Recommended Action:</strong> Inspect pipelines for leaks and upgrade the water recycling system.</p>
+                    <div class="alert-header">
+                        <h4>Alert: Inefficient Water Usage</h4>
+                        <p><strong>Water Wastage:</strong> 15% of total consumption (<span id="waterThresholdDisplay">12</span>%)</p>
+                    </div>
+                    <div class="alert-content">
+                        <p><strong>Possible Root Cause:</strong> Leaks or outdated recycling systems.</p>
+                        <p class="recommendation"><strong>Recommended Action:</strong> Inspect pipelines for leaks and upgrade the water recycling system.</p>
+                    </div>
                 </div>
                 <div class="alert-card">
-                    <h4>Alert: Supply Chain Delays</h4>
-                    <p><strong>Delay Detected:</strong> 10% increase in lead time (<span id="supplyChainThresholdDisplay">5</span>%)</p>
-                    <p><strong>Possible Root Cause:</strong> Transport inefficiencies or supplier capacity constraints.</p>
-                    <p class="recommendation"><strong>Recommended Action:</strong> Communicate with suppliers and consider alternative routes.</p>
+                    <div class="alert-header">
+                        <h4>Alert: Supply Chain Delays</h4>
+                        <p><strong>Delay Detected:</strong> 10% increase in lead time (<span id="supplyChainThresholdDisplay">5</span>%)</p>
+                    </div>
+                    <div class="alert-content">
+                        <p><strong>Possible Root Cause:</strong> Transport inefficiencies or supplier capacity constraints.</p>
+                        <p class="recommendation"><strong>Recommended Action:</strong> Communicate with suppliers and consider alternative routes.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.alert-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const alertCard = this.parentElement;
+                    alertCard.classList.toggle('expanded');
+                });
+            });
+        });
+        
         const combinedData = {
             labels: ['Q1', 'Q2', 'Q3', 'Q4'],
             datasets: [
