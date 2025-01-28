@@ -8,256 +8,159 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body, html {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            height: 100%;
+            height: 100vh;
             overflow: hidden;
             background-color: rgba(204, 234, 250, 0.9);
         }
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            height: 50px;
             background-color: #003366;
             color: white;
-            padding: 10px;
-            font-size: 1.2em;
+            padding: 8px 10px;
             position: fixed;
-            top: 0;
             width: 100%;
             z-index: 1000;
         }
         header h1 {
+            font-size: 1.3rem;
             margin: 0;
-            font-size: 1.5em;
-        }
-        nav {
-            display: flex;
-            gap: 10px;
         }
         nav a {
-            color: white;
-            text-decoration: none;
-            background-color: #0056b3;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        nav a:hover {
-            background-color: #003f7f;
+            font-size: 0.9rem;
+            padding: 3px 8px;
         }
         .container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 60px);
-            box-sizing: border-box;
-            padding: 10px;
-            margin-top: 60px;
-            gap: 10px;
+            height: calc(100vh - 50px);
+            margin-top: 50px;
+            padding: 8px;
         }
         .main-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 10px;
+            display: flex;
             height: 100%;
+            gap: 8px;
         }
         .section {
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            flex: 1;
+            padding: 8px;
+            height: 100%;
             overflow: hidden;
         }
-        .section h2 {
-            font-size: 1.2em;
-            color: #007bff;
-            margin-bottom: 10px;
+        #thresholdsSection {
+            max-width: 40%;
+        }
+        #alertsSection {
+            max-width: 60%;
+            overflow-y: auto;
         }
         .chart-container {
-            flex-grow: 1;
-            height: 40%;
-        }
-        canvas {
-            width: 100%;
-            height: 100%;
+            height: 180px;
+            margin-bottom: 8px;
         }
         .alert-card {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 0.9em;
+            padding: 6px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
         }
-        .alert-card h4 {
-            font-size: 1em;
-            color: #dc3545;
-            margin-bottom: 5px;
+        .form-control {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
         }
-        .recommendation {
-            color: #007bff;
+        .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
         }
-        .threshold-update-message {
-            display: none;
-            color: #28a745;
-            margin-top: 10px;
-            font-weight: bold;
+        .threshold-form .mb-3 {
+            margin-bottom: 0.5rem !important;
         }
-        .alert-header {
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-        }
-        .alert-header:hover {
-            background-color: #f0f0f0;
-        }
-        .alert-content {
-            display: none;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-            margin-top: 5px;
-        }
-        .alert-card.expanded .alert-content {
-            display: block;
-        }
-        .threshold-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .threshold-form .btn {
-            align-self: flex-start;
+        h2 {
+            font-size: 1.1rem !important;
+            margin-bottom: 6px !important;
         }
     </style>
 </head>
 <body>
-    <header>
+    <header class="d-flex justify-content-between align-items-center">
         <h1>Sustainable Action Alerts</h1>
-        <nav>
-            <a href="/knowledge_hub">Home</a>
-            <a href="/sustainability_report">Sustainability Report</a>
-            <a href="/sustainability_alerts">Sustainability Alerts</a>
+        <nav class="d-flex gap-2">
+            <a href="/knowledge_hub" class="btn btn-sm btn-primary">Home</a>
+            <a href="/sustainability_report" class="btn btn-sm btn-primary">Report</a>
+            <a href="/sustainability_alerts" class="btn btn-sm btn-primary">Alerts</a>
         </nav>
     </header>
     <div class="container">
         <div class="main-container">
-            <div class="section">
-                <h2>Set and Adjust Thresholds</h2>
+            <div class="section" id="thresholdsSection">
+                <h2>Set Thresholds</h2>
                 <div class="chart-container">
-                    <h5>Operational Metrics Over Time</h5>
                     <canvas id="combinedChart"></canvas>
                 </div>
-                <form class="threshold-form mt-4" id="thresholdForm">
+                <form class="threshold-form" id="thresholdForm">
                     <div class="mb-3">
-                        <label for="energy-threshold" class="form-label">Energy Consumption Threshold (kWh):</label>
-                        <input type="number" class="form-control" id="energy-threshold" value="96" min="50" max="200">
+                        <label class="form-label">Energy (kWh):</label>
+                        <input type="number" class="form-control form-control-sm" id="energy-threshold" value="96">
                     </div>
                     <div class="mb-3">
-                        <label for="emissions-threshold" class="form-label">Carbon Emissions Threshold (metric tons CO<sub>2</sub>e):</label>
-                        <input type="number" class="form-control" id="emissions-threshold" value="18" min="10" max="50">
+                        <label class="form-label">CO<sub>2</sub>e (tons):</label>
+                        <input type="number" class="form-control form-control-sm" id="emissions-threshold" value="18">
                     </div>
                     <div class="mb-3">
-                        <label for="water-threshold" class="form-label">Water Wastage Threshold (%):</label>
-                        <input type="number" class="form-control" id="water-threshold" value="12" min="5" max="25">
+                        <label class="form-label">Water (%):</label>
+                        <input type="number" class="form-control form-control-sm" id="water-threshold" value="12">
                     </div>
                     <div class="mb-3">
-                        <label for="supply-chain-threshold" class="form-label">Supply Chain Delay Threshold (%):</label>
-                        <input type="number" class="form-control" id="supply-chain-threshold" value="5" min="0" max="20">
+                        <label class="form-label">Delays (%):</label>
+                        <input type="number" class="form-control form-control-sm" id="supply-chain-threshold" value="5">
                     </div>
-                    <button type="submit" class="btn btn-primary">Update Thresholds</button>
-                    <p class="threshold-update-message" id="updateMessage">Thresholds successfully updated!</p>
+                    <button type="submit" class="btn btn-sm btn-primary w-100">Update</button>
+                    <p class="threshold-update-message mt-1 mb-0" id="updateMessage"></p>
                 </form>
             </div>
-            <div class="section">
+            <div class="section" id="alertsSection">
                 <h2>Current Alerts</h2>
                 <div class="alert-card">
                     <div class="alert-header">
-                        <h4>Alert: High Energy Consumption Detected</h4>
-                        <p><strong>Current Level:</strong> 125% of the predefined threshold (<span id="energyThresholdDisplay">96</span> kWh)</p>
-                    </div>
-                    <div class="alert-content">
-                        <p><strong>Possible Root Cause:</strong> Inefficient machinery usage or equipment malfunction.</p>
-                        <p class="recommendation"><strong>Recommended Action:</strong> Optimize scheduling and inspect machinery.</p>
+                        <h4 class="mb-1">High Energy Consumption</h4>
+                        <p class="mb-0">125% of 96 kWh</p>
                     </div>
                 </div>
                 <div class="alert-card">
                     <div class="alert-header">
-                        <h4>Alert: High Carbon Emissions</h4>
-                        <p><strong>Current Emissions:</strong> 22 metric tons CO<sub>2</sub>e (<span id="emissionsThresholdDisplay">18</span> metric tons)</p>
-                    </div>
-                    <div class="alert-content">
-                        <p><strong>Possible Root Cause:</strong> Outdated exhaust systems or inefficient combustion processes.</p>
-                        <p class="recommendation"><strong>Recommended Action:</strong> Perform maintenance on exhaust systems and switch to cleaner fuel sources.</p>
+                        <h4 class="mb-1">High Carbon Emissions</h4>
+                        <p class="mb-0">22 tons vs 18 tons</p>
                     </div>
                 </div>
                 <div class="alert-card">
                     <div class="alert-header">
-                        <h4>Alert: Inefficient Water Usage</h4>
-                        <p><strong>Water Wastage:</strong> 15% of total consumption (<span id="waterThresholdDisplay">12</span>%)</p>
-                    </div>
-                    <div class="alert-content">
-                        <p><strong>Possible Root Cause:</strong> Leaks or outdated recycling systems.</p>
-                        <p class="recommendation"><strong>Recommended Action:</strong> Inspect pipelines for leaks and upgrade the water recycling system.</p>
+                        <h4 class="mb-1">Water Wastage</h4>
+                        <p class="mb-0">15% vs 12%</p>
                     </div>
                 </div>
                 <div class="alert-card">
                     <div class="alert-header">
-                        <h4>Alert: Supply Chain Delays</h4>
-                        <p><strong>Delay Detected:</strong> 10% increase in lead time (<span id="supplyChainThresholdDisplay">5</span>%)</p>
-                    </div>
-                    <div class="alert-content">
-                        <p><strong>Possible Root Cause:</strong> Transport inefficiencies or supplier capacity constraints.</p>
-                        <p class="recommendation"><strong>Recommended Action:</strong> Communicate with suppliers and consider alternative routes.</p>
+                        <h4 class="mb-1">Supply Chain Delays</h4>
+                        <p class="mb-0">10% vs 5%</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.alert-header').forEach(header => {
-                header.addEventListener('click', function() {
-                    const alertCard = this.parentElement;
-                    alertCard.classList.toggle('expanded');
-                });
-            });
+        // Simplified chart initialization
+        new Chart(document.getElementById('combinedChart'), {
+            type: 'line',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    data: [80, 90, 96, 120],
+                    borderColor: '#007bff',
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
-        
-        const combinedData = {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-            datasets: [
-                { label: 'Energy Consumption (kWh)', data: [80, 90, 96, 120], borderColor: '#007bff', backgroundColor: 'rgba(0, 123, 255, 0.1)' },
-                { label: 'Carbon Emissions (metric tons CO2e)', data: [16, 17, 18, 22], borderColor: '#dc3545', backgroundColor: 'rgba(220, 53, 69, 0.1)' },
-                { label: 'Water Wastage (%)', data: [10, 11, 12, 15], borderColor: '#28a745', backgroundColor: 'rgba(40, 167, 69, 0.1)' },
-                { label: 'Supply Chain Delay (%)', data: [3, 4, 5, 10], borderColor: '#ffc107', backgroundColor: 'rgba(255, 193, 7, 0.1)' }
-            ]
-        };
-
-        function createCombinedChart(ctx) {
-            new Chart(ctx, {
-                type: 'line',
-                data: combinedData,
-                options: { responsive: true, scales: { y: { beginAtZero: true } } }
-            });
-        }
-
-        window.onload = function () {
-            createCombinedChart(document.getElementById('combinedChart'));
-            document.getElementById('thresholdForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                ['energy', 'emissions', 'water', 'supply-chain'].forEach(id => {
-                    const threshold = document.getElementById(`${id}-threshold`).value;
-                    document.getElementById(`${id}ThresholdDisplay`).textContent = threshold;
-                });
-                const updateMessage = document.getElementById('updateMessage');
-                updateMessage.style.display = 'block';
-                setTimeout(() => updateMessage.style.display = 'none', 3000);
-            });
-        };
     </script>
 </body>
 </html>
