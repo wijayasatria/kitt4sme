@@ -49,17 +49,17 @@
         .container {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: calc(100vh - 60px);
             box-sizing: border-box;
-            padding: 10px;
+            padding: 10px 10px 0;
             margin-top: 60px;
             gap: 10px;
         }
         .main-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: 1.2fr 1fr;
             gap: 10px;
-            height: calc(100% - 60px);
+            height: 100%;
         }
         .section {
             background-color: white;
@@ -68,7 +68,8 @@
             padding: 10px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            height: 100%;
+            min-height: 0;
             overflow: hidden;
         }
         .section h2 {
@@ -77,8 +78,8 @@
             margin-bottom: 10px;
         }
         .chart-container {
-            flex-grow: 1;
-            height: 40%;
+            height: 35%;
+            min-height: 200px;
         }
         canvas {
             width: 100%;
@@ -88,9 +89,12 @@
             background-color: #f9f9f9;
             border: 1px solid #ddd;
             border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 8px;
+            margin-bottom: 8px;
             font-size: 0.9em;
+        }
+        .alert-card:last-child {
+            margin-bottom: 0;
         }
         .alert-card h4 {
             font-size: 1em;
@@ -117,12 +121,30 @@
         }
         .alert-content {
             display: none;
-            padding-top: 10px;
+            padding-top: 5px;
             border-top: 1px solid #eee;
             margin-top: 5px;
         }
         .alert-card.expanded .alert-content {
             display: block;
+        }
+        .threshold-form {
+            padding: 5px;
+            margin-top: 10px;
+        }
+        .threshold-form .form-label {
+            margin-bottom: 2px;
+        }
+        .threshold-form .mb-3 {
+            margin-bottom: 8px !important;
+        }
+        #thresholdForm button {
+            margin-top: 5px;
+            padding: 5px 10px;
+        }
+        .alerts-container {
+            max-height: calc(100% - 40px);
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -166,44 +188,46 @@
             </div>
             <div class="section">
                 <h2>Current Alerts</h2>
-                <div class="alert-card">
-                    <div class="alert-header">
-                        <h4>Alert: High Energy Consumption Detected</h4>
-                        <p><strong>Current Level:</strong> 125% of the predefined threshold (<span id="energyThresholdDisplay">96</span> kWh)</p>
+                <div class="alerts-container">
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <h4>Alert: High Energy Consumption Detected</h4>
+                            <p><strong>Current Level:</strong> 125% of the predefined threshold (<span id="energyThresholdDisplay">96</span> kWh)</p>
+                        </div>
+                        <div class="alert-content">
+                            <p><strong>Possible Root Cause:</strong> Inefficient machinery usage or equipment malfunction.</p>
+                            <p class="recommendation"><strong>Recommended Action:</strong> Optimize scheduling and inspect machinery.</p>
+                        </div>
                     </div>
-                    <div class="alert-content">
-                        <p><strong>Possible Root Cause:</strong> Inefficient machinery usage or equipment malfunction.</p>
-                        <p class="recommendation"><strong>Recommended Action:</strong> Optimize scheduling and inspect machinery.</p>
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <h4>Alert: High Carbon Emissions</h4>
+                            <p><strong>Current Emissions:</strong> 22 metric tons CO<sub>2</sub>e (<span id="emissionsThresholdDisplay">18</span> metric tons)</p>
+                        </div>
+                        <div class="alert-content">
+                            <p><strong>Possible Root Cause:</strong> Outdated exhaust systems or inefficient combustion processes.</p>
+                            <p class="recommendation"><strong>Recommended Action:</strong> Perform maintenance on exhaust systems and switch to cleaner fuel sources.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="alert-card">
-                    <div class="alert-header">
-                        <h4>Alert: High Carbon Emissions</h4>
-                        <p><strong>Current Emissions:</strong> 22 metric tons CO<sub>2</sub>e (<span id="emissionsThresholdDisplay">18</span> metric tons)</p>
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <h4>Alert: Inefficient Water Usage</h4>
+                            <p><strong>Water Wastage:</strong> 15% of total consumption (<span id="waterThresholdDisplay">12</span>%)</p>
+                        </div>
+                        <div class="alert-content">
+                            <p><strong>Possible Root Cause:</strong> Leaks or outdated recycling systems.</p>
+                            <p class="recommendation"><strong>Recommended Action:</strong> Inspect pipelines for leaks and upgrade the water recycling system.</p>
+                        </div>
                     </div>
-                    <div class="alert-content">
-                        <p><strong>Possible Root Cause:</strong> Outdated exhaust systems or inefficient combustion processes.</p>
-                        <p class="recommendation"><strong>Recommended Action:</strong> Perform maintenance on exhaust systems and switch to cleaner fuel sources.</p>
-                    </div>
-                </div>
-                <div class="alert-card">
-                    <div class="alert-header">
-                        <h4>Alert: Inefficient Water Usage</h4>
-                        <p><strong>Water Wastage:</strong> 15% of total consumption (<span id="waterThresholdDisplay">12</span>%)</p>
-                    </div>
-                    <div class="alert-content">
-                        <p><strong>Possible Root Cause:</strong> Leaks or outdated recycling systems.</p>
-                        <p class="recommendation"><strong>Recommended Action:</strong> Inspect pipelines for leaks and upgrade the water recycling system.</p>
-                    </div>
-                </div>
-                <div class="alert-card">
-                    <div class="alert-header">
-                        <h4>Alert: Supply Chain Delays</h4>
-                        <p><strong>Delay Detected:</strong> 10% increase in lead time (<span id="supplyChainThresholdDisplay">5</span>%)</p>
-                    </div>
-                    <div class="alert-content">
-                        <p><strong>Possible Root Cause:</strong> Transport inefficiencies or supplier capacity constraints.</p>
-                        <p class="recommendation"><strong>Recommended Action:</strong> Communicate with suppliers and consider alternative routes.</p>
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <h4>Alert: Supply Chain Delays</h4>
+                            <p><strong>Delay Detected:</strong> 10% increase in lead time (<span id="supplyChainThresholdDisplay">5</span>%)</p>
+                        </div>
+                        <div class="alert-content">
+                            <p><strong>Possible Root Cause:</strong> Transport inefficiencies or supplier capacity constraints.</p>
+                            <p class="recommendation"><strong>Recommended Action:</strong> Communicate with suppliers and consider alternative routes.</p>
+                        </div>
                     </div>
                 </div>
             </div>
